@@ -1,0 +1,14 @@
+{
+  "name": "crux",
+  "private": true,
+  "scripts": {
+    "dev:api": "turbo run dev --filter=@crux/api",
+    "dev:mobile": "turbo run dev --filter=@crux/mobile",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "db:generate": "turbo run db:generate --filter=@crux/api",
+    "db:migrate": "turbo run db:migrate --filter=@crux/api",
+    "db:seed": "turbo run db:seed --filter=@crux/api"
+  },
+  "packageManager": "pnpm@10.4.1"
+}

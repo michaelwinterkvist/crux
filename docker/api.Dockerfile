@@ -1,0 +1,44 @@
+FROM node:22-alpine AS builder
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+# Copy workspace config
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc ./
+COPY packages/shared/package.json ./packages/shared/
+COPY apps/api/package.json ./apps/api/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile || pnpm install
+
+# Copy source
+COPY packages/shared/ ./packages/shared/
+COPY apps/api/ ./apps/api/
+COPY tsconfig.base.json ./
+
+# Build
+RUN pnpm --filter @crux/shared build && pnpm --filter @crux/api build
+
+# Production stage
+FROM node:22-alpine AS runner
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc ./
+COPY packages/shared/package.json ./packages/shared/
+COPY apps/api/package.json ./apps/api/
+
+RUN pnpm install --prod --frozen-lockfile || pnpm install --prod
+
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/drizzle ./apps/api/drizzle
+
+WORKDIR /app/apps/api
+
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]
