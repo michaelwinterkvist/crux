@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../lib/api';
@@ -8,12 +8,12 @@ import { GradeChip } from '../../components/GradeChip';
 import { ASCENT_STYLES, ASCENT_RESULTS, type GradeDefinition, type GradeSystem } from '@crux/shared';
 import { colors, spacing, fontSize, borderRadius } from '../../theme';
 
-const styleIcons: Record<string, string> = {
-  flash: '⚡ Flash',
-  onsight: '👁️ Onsight',
-  redpoint: '🔴 Redpoint',
-  repeat: '🔁 Repeat',
-  attempt: '❌ Attempt',
+const styleLabels: Record<string, string> = {
+  flash: 'Flash',
+  onsight: 'Onsight',
+  redpoint: 'Redpoint',
+  repeat: 'Repeat',
+  attempt: 'Attempt',
 };
 
 export default function NewAscentScreen() {
@@ -87,7 +87,12 @@ export default function NewAscentScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior="padding"
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 80}
+    >
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       {/* Grade */}
       <Text style={styles.label}>Grade</Text>
       <Pressable style={styles.gradeButton} onPress={() => setShowGradePicker(true)}>
@@ -116,7 +121,7 @@ export default function NewAscentScreen() {
             onPress={() => handleStyleChange(s)}
           >
             <Text style={[styles.styleChipText, style === s && styles.styleChipTextActive]}>
-              {styleIcons[s] ?? s}
+              {styleLabels[s] ?? s}
             </Text>
           </Pressable>
         ))}
@@ -196,6 +201,7 @@ export default function NewAscentScreen() {
         </Pressable>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -242,7 +248,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   styleChipActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surfaceLight,
     borderColor: colors.primary,
   },
   styleChipText: {
@@ -250,7 +256,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
   },
   styleChipTextActive: {
-    color: colors.white,
+    color: colors.text,
   },
   segmented: {
     flexDirection: 'row',
@@ -266,7 +272,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   segmentActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surfaceLight,
     borderColor: colors.primary,
   },
   segmentText: {
@@ -275,7 +281,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   segmentTextActive: {
-    color: colors.white,
+    color: colors.text,
   },
   stepper: {
     flexDirection: 'row',

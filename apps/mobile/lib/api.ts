@@ -3,8 +3,8 @@ import * as SecureStore from 'expo-secure-store';
 const TOKEN_KEY = 'crux_token';
 const REFRESH_TOKEN_KEY = 'crux_refresh_token';
 
-// Set this to your API URL
-let API_BASE = 'http://10.0.2.2:3000/api/v1'; // Android emulator localhost
+// API on michael-se1 via Tailscale
+let API_BASE = 'http://100.107.193.6:3001/api/v1';
 
 export function setApiBase(url: string) {
   API_BASE = url;

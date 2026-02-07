@@ -2,23 +2,31 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../../lib/api';
 import { GradeChip } from '../../components/GradeChip';
 import { formatDate } from '@crux/shared';
 import { colors, spacing, fontSize, borderRadius } from '../../theme';
 
-const styleIcons: Record<string, string> = {
-  flash: '⚡',
-  onsight: '👁️',
-  redpoint: '🔴',
-  repeat: '🔁',
-  attempt: '❌',
+const styleLabels: Record<string, string> = {
+  flash: 'Flash',
+  onsight: 'Onsight',
+  redpoint: 'Redpoint',
+  repeat: 'Repeat',
+  attempt: 'Attempt',
+};
+
+const resultStyles: Record<string, { label: string; color: string }> = {
+  send: { label: 'Sent', color: colors.primary },
+  project: { label: 'Proj', color: colors.textSecondary },
+  fall: { label: 'Fall', color: colors.textMuted },
 };
 
 export default function SessionDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['session', id],
@@ -59,36 +67,39 @@ export default function SessionDetailScreen() {
       <FlatList
         data={session.ascents ?? []}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, { paddingBottom: 80 + insets.bottom }]}
         refreshing={isLoading}
         onRefresh={refetch}
-        renderItem={({ item }) => (
-          <Pressable
-            style={styles.ascentRow}
-            onLongPress={() => {
-              Alert.alert('Delete Ascent', `Remove this ${item.grade} ${item.style}?`, [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                  text: 'Delete',
-                  style: 'destructive',
-                  onPress: () => deleteAscent.mutate(item.id),
-                },
-              ]);
-            }}
-          >
-            <GradeChip grade={item.grade} numeric={item.normalizedGrade} size="md" />
-            <View style={styles.ascentInfo}>
-              {item.name && <Text style={styles.ascentName}>{item.name}</Text>}
-              <Text style={styles.ascentStyle}>
-                {styleIcons[item.style] ?? ''} {item.style}
-                {item.attempts > 1 ? ` · ${item.attempts} attempts` : ''}
+        renderItem={({ item }) => {
+          const result = resultStyles[item.result] ?? resultStyles.fall;
+          return (
+            <Pressable
+              style={styles.ascentRow}
+              onLongPress={() => {
+                Alert.alert('Delete Ascent', `Remove this ${item.grade} ${item.style}?`, [
+                  { text: 'Cancel', style: 'cancel' },
+                  {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: () => deleteAscent.mutate(item.id),
+                  },
+                ]);
+              }}
+            >
+              <GradeChip grade={item.grade} numeric={item.normalizedGrade} size="md" />
+              <View style={styles.ascentInfo}>
+                {item.name && <Text style={styles.ascentName}>{item.name}</Text>}
+                <Text style={styles.ascentStyle}>
+                  {styleLabels[item.style] ?? item.style}
+                  {item.attempts > 1 ? ` · ${item.attempts} attempts` : ''}
+                </Text>
+              </View>
+              <Text style={[styles.resultBadge, { color: result.color }]}>
+                {result.label}
               </Text>
-            </View>
-            <Text style={styles.resultBadge}>
-              {item.result === 'send' ? '✅' : item.result === 'project' ? '🔄' : '❌'}
-            </Text>
-          </Pressable>
-        )}
+            </Pressable>
+          );
+        }}
         ListHeaderComponent={
           <Text style={styles.sectionTitle}>
             Ascents ({session.ascents?.length ?? 0})
@@ -101,10 +112,10 @@ export default function SessionDetailScreen() {
 
       {/* Add Ascent FAB */}
       <Pressable
-        style={styles.fab}
+        style={[styles.fab, { bottom: spacing.lg + insets.bottom }]}
         onPress={() => router.push(`/ascent/new?sessionId=${id}`)}
       >
-        <Text style={styles.fabText}>+ Log Ascent</Text>
+        <Text style={styles.fabText}>Log Ascent</Text>
       </Pressable>
     </View>
   );
@@ -181,7 +192,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   resultBadge: {
-    fontSize: 18,
+    fontSize: fontSize.sm,
+    fontWeight: '600',
   },
   emptyText: {
     color: colors.textSecondary,
@@ -198,11 +210,6 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     padding: spacing.md,
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
   },
   fabText: {
     color: colors.white,

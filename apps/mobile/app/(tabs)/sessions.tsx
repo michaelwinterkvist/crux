@@ -34,7 +34,7 @@ export default function SessionsScreen() {
           <View style={styles.empty}>
             <Text style={styles.emptyText}>No sessions yet</Text>
             <Pressable style={styles.addButton} onPress={() => router.push('/session/new')}>
-              <Text style={styles.addButtonText}>Log your first session</Text>
+              <Text style={styles.addButtonText}>Create your first session</Text>
             </Pressable>
           </View>
         }
@@ -85,11 +85,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
   },
   fabText: {
     color: colors.white,

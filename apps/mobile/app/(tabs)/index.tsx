@@ -41,7 +41,7 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.greeting}>Hey, {user?.name ?? 'climber'}</Text>
+      <Text style={styles.greeting}>{user?.name ?? 'Climber'}</Text>
 
       {/* Quick Stats */}
       <View style={styles.statsRow}>
@@ -66,12 +66,10 @@ export default function HomeScreen() {
       {/* Quick Actions */}
       <View style={styles.actionsRow}>
         <Pressable style={styles.actionButton} onPress={() => router.push('/session/new')}>
-          <Text style={styles.actionIcon}>+</Text>
-          <Text style={styles.actionText}>New Session</Text>
+          <Text style={styles.actionButtonText}>New Session</Text>
         </Pressable>
-        <Pressable style={styles.actionButton} onPress={() => router.push('/wellbeing/')}>
-          <Text style={styles.actionIcon}>💪</Text>
-          <Text style={styles.actionText}>Check In</Text>
+        <Pressable style={styles.actionButtonSecondary} onPress={() => router.push('/wellbeing/')}>
+          <Text style={styles.actionText}>Wellbeing</Text>
         </Pressable>
       </View>
 
@@ -79,7 +77,7 @@ export default function HomeScreen() {
       <Text style={styles.sectionTitle}>Recent Sessions</Text>
       {recentSessions.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyText}>No sessions yet. Start logging!</Text>
+          <Text style={styles.emptyText}>No sessions logged yet</Text>
         </View>
       ) : (
         recentSessions.map((session: any) => (
@@ -168,22 +166,30 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   actionButton: {
-    flex: 1,
+    flex: 2,
     backgroundColor: colors.primary,
     borderRadius: borderRadius.md,
     padding: spacing.md,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
   },
-  actionIcon: {
-    fontSize: 20,
+  actionButtonSecondary: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  actionButtonText: {
     color: colors.white,
+    fontSize: fontSize.md,
     fontWeight: '700',
   },
   actionText: {
-    color: colors.white,
+    color: colors.text,
     fontSize: fontSize.md,
     fontWeight: '600',
   },

@@ -1,18 +1,18 @@
 export const colors = {
-  primary: '#FF6B35',     // Warm orange - energetic, climbing
-  primaryDark: '#E55A2B',
-  primaryLight: '#FF8A5C',
-  background: '#0D1117',  // Dark background
-  surface: '#161B22',     // Card/surface
-  surfaceLight: '#21262D',
-  text: '#F0F6FC',
-  textSecondary: '#8B949E',
-  textMuted: '#484F58',
-  border: '#30363D',
-  success: '#3FB950',
-  warning: '#D29922',
-  error: '#F85149',
-  white: '#FFFFFF',
+  primary: '#C9A24D',     // Soft Gold - restrained accent
+  primaryDark: '#B08A3E',
+  primaryLight: '#D4B36A',
+  background: '#0F1E2E',  // Anchor Blue
+  surface: '#162336',     // Card/surface
+  surfaceLight: '#1D2D42',
+  text: '#F4F4F2',        // Chalk White
+  textSecondary: '#8A93A0', // Slate Grey
+  textMuted: '#5A6577',
+  border: '#243044',
+  success: '#C9A24D',     // Gold = success per brand
+  warning: '#8B4A3B',     // Muted Rust
+  error: '#8B4A3B',       // Muted Rust
+  white: '#F4F4F2',
 
   // Grade colors
   gradeGreen: '#4CAF50',

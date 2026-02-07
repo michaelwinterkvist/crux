@@ -37,7 +37,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>CRUX</Text>
-      <Text style={styles.subtitle}>{isRegister ? 'Create Account' : 'Welcome Back'}</Text>
+      <Text style={styles.subtitle}>{isRegister ? 'Create Account' : 'Sign In'}</Text>
 
       {isRegister && (
         <TextInput

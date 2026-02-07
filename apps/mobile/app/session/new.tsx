@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../lib/api';
@@ -46,7 +46,12 @@ export default function NewSessionScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior="padding"
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 80}
+    >
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       {/* Date */}
       <Text style={styles.label}>Date</Text>
       <TextInput
@@ -131,10 +136,11 @@ export default function NewSessionScreen() {
         disabled={mutation.isPending}
       >
         <Text style={styles.createButtonText}>
-          {mutation.isPending ? 'Creating...' : 'Start Logging'}
+          {mutation.isPending ? 'Creating...' : 'Create Session'}
         </Text>
       </Pressable>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -182,7 +188,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   segmentActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surfaceLight,
     borderColor: colors.primary,
   },
   segmentText: {
@@ -191,7 +197,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   segmentTextActive: {
-    color: colors.white,
+    color: colors.text,
   },
   locationScroll: {
     marginBottom: spacing.sm,
@@ -206,7 +212,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   locationChipActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surfaceLight,
     borderColor: colors.primary,
   },
   locationChipText: {
@@ -214,7 +220,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
   },
   locationChipTextActive: {
-    color: colors.white,
+    color: colors.text,
   },
   createButton: {
     backgroundColor: colors.primary,

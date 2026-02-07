@@ -17,18 +17,10 @@ interface SessionCardProps {
   onPress: () => void;
 }
 
-const typeIcons: Record<string, string> = {
-  bouldering: '🧗',
-  sport: '🧗‍♂️',
-  mixed: '🔀',
-  training: '💪',
-};
-
 export function SessionCard({ session, onPress }: SessionCardProps) {
   return (
     <Pressable style={styles.card} onPress={onPress}>
       <View style={styles.header}>
-        <Text style={styles.icon}>{typeIcons[session.type] ?? '🧗'}</Text>
         <View style={styles.headerText}>
           <Text style={styles.date}>{formatDate(session.date)}</Text>
           {session.locationName && (
@@ -62,9 +54,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-  },
-  icon: {
-    fontSize: 28,
   },
   headerText: {
     flex: 1,

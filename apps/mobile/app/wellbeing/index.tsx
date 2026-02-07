@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../lib/api';
@@ -7,12 +7,12 @@ import { todayString } from '@crux/shared';
 import { colors, spacing, fontSize, borderRadius } from '../../theme';
 
 const metrics = [
-  { key: 'sleepQuality', label: 'Sleep Quality', emoji: ['😴', '😪', '😐', '😊', '😁'] },
-  { key: 'fatigue', label: 'Fatigue', emoji: ['💪', '🙂', '😐', '😮‍💨', '😵'] },
-  { key: 'fingerHealth', label: 'Finger Health', emoji: ['🤕', '😬', '😐', '👌', '💪'] },
-  { key: 'skinCondition', label: 'Skin', emoji: ['🩹', '😬', '😐', '👌', '✨'] },
-  { key: 'motivation', label: 'Motivation', emoji: ['😞', '😐', '🙂', '😊', '🔥'] },
-  { key: 'stress', label: 'Stress', emoji: ['😌', '🙂', '😐', '😰', '🤯'] },
+  { key: 'sleepQuality', label: 'Sleep Quality', scale: ['Poor', 'Low', 'Fair', 'Good', 'Great'] },
+  { key: 'fatigue', label: 'Fatigue', scale: ['None', 'Low', 'Moderate', 'High', 'Severe'] },
+  { key: 'fingerHealth', label: 'Finger Health', scale: ['Injured', 'Sore', 'Fair', 'Good', 'Strong'] },
+  { key: 'skinCondition', label: 'Skin', scale: ['Raw', 'Tender', 'Fair', 'Good', 'Fresh'] },
+  { key: 'motivation', label: 'Motivation', scale: ['Low', 'Below avg', 'Neutral', 'Good', 'High'] },
+  { key: 'stress', label: 'Stress', scale: ['None', 'Low', 'Moderate', 'High', 'Severe'] },
 ] as const;
 
 export default function WellbeingScreen() {
@@ -51,22 +51,36 @@ export default function WellbeingScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior="padding"
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 80}
+    >
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <Text style={styles.dateText}>{date}</Text>
 
-      {metrics.map(({ key, label, emoji }) => (
+      {metrics.map(({ key, label, scale }) => (
         <View key={key} style={styles.metricRow}>
           <Text style={styles.metricLabel}>{label}</Text>
-          <View style={styles.emojiRow}>
-            {emoji.map((e, i) => (
-              <Pressable
-                key={i}
-                style={[styles.emojiButton, values[key] === i + 1 && styles.emojiButtonActive]}
-                onPress={() => setMetric(key, i + 1)}
-              >
-                <Text style={styles.emoji}>{e}</Text>
-              </Pressable>
-            ))}
+          <View style={styles.scaleRow}>
+            {scale.map((text, i) => {
+              const value = i + 1;
+              const isActive = values[key] === value;
+              return (
+                <Pressable
+                  key={i}
+                  style={[styles.scaleButton, isActive && styles.scaleButtonActive]}
+                  onPress={() => setMetric(key, value)}
+                >
+                  <Text style={[styles.scaleNumber, isActive && styles.scaleNumberActive]}>
+                    {value}
+                  </Text>
+                  <Text style={[styles.scaleLabel, isActive && styles.scaleLabelActive]}>
+                    {text}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
         </View>
       ))}
@@ -113,10 +127,11 @@ export default function WellbeingScreen() {
         disabled={mutation.isPending}
       >
         <Text style={styles.saveButtonText}>
-          {mutation.isPending ? 'Saving...' : 'Save Check-in'}
+          {mutation.isPending ? 'Saving...' : 'Save'}
         </Text>
       </Pressable>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -143,26 +158,39 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: spacing.sm,
   },
-  emojiRow: {
+  scaleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: spacing.xs,
   },
-  emojiButton: {
+  scaleButton: {
     flex: 1,
     backgroundColor: colors.surface,
     borderRadius: borderRadius.md,
-    padding: spacing.sm,
+    paddingVertical: spacing.sm,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  emojiButtonActive: {
+  scaleButtonActive: {
     borderColor: colors.primary,
     backgroundColor: colors.surfaceLight,
   },
-  emoji: {
-    fontSize: 24,
+  scaleNumber: {
+    color: colors.textSecondary,
+    fontSize: fontSize.md,
+    fontWeight: '700',
+  },
+  scaleNumberActive: {
+    color: colors.text,
+  },
+  scaleLabel: {
+    color: colors.textMuted,
+    fontSize: 9,
+    marginTop: 2,
+  },
+  scaleLabelActive: {
+    color: colors.textSecondary,
   },
   row: {
     flexDirection: 'row',

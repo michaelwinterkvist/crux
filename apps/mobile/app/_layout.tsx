@@ -31,7 +31,7 @@ export default function RootLayout() {
           <Stack.Screen name="session/new" options={{ title: 'New Session', presentation: 'modal' }} />
           <Stack.Screen name="session/[id]" options={{ title: 'Session' }} />
           <Stack.Screen name="ascent/new" options={{ title: 'Log Ascent', presentation: 'modal' }} />
-          <Stack.Screen name="wellbeing/index" options={{ title: 'Wellbeing Check-in', presentation: 'modal' }} />
+          <Stack.Screen name="wellbeing/index" options={{ title: 'Wellbeing', presentation: 'modal' }} />
           <Stack.Screen name="auth/login" options={{ headerShown: false }} />
         </Stack>
       </AuthProvider>
