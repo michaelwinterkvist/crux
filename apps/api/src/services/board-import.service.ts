@@ -19,14 +19,14 @@ export async function importKilterHistory(
   // Authenticate with Kilter
   const kilterSession = await kilterService.authenticate(connection.username, password);
 
-  // Fetch ascents (incremental if we've synced before)
+  // Fetch ascents and climbs together (incremental if we've synced before)
   const since = connection.lastSyncAt ?? undefined;
-  const kilterAscents = await kilterService.fetchAscents(kilterSession.token, since ?? undefined);
+  const syncData = await kilterService.fetchAscentsAndClimbs(kilterSession.token, since ?? undefined);
+  const kilterAscents = syncData.ascents;
 
-  // Also fetch climb details for names
-  const kilterClimbs = await kilterService.fetchClimbs(kilterSession.token, since ?? undefined);
+  // Build climb name lookup
   const climbMap = new Map<string, kilterService.KilterClimb>();
-  for (const climb of kilterClimbs) {
+  for (const climb of syncData.climbs) {
     climbMap.set(climb.uuid, climb);
   }
 

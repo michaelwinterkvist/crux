@@ -44,10 +44,15 @@ export default function SessionDetailScreen() {
 
   const deleteSession = useMutation({
     mutationFn: () => api.delete(`/sessions/${id}`),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['sessions'] });
-      await queryClient.invalidateQueries({ queryKey: ['stats'] });
-      router.replace('/(tabs)/sessions');
+    onSuccess: () => {
+      // Remove deleted session from cache directly (tab may not be mounted)
+      queryClient.setQueryData(['sessions'], (old: any) => {
+        if (!old) return old;
+        return { ...old, data: old.data?.filter((s: any) => s.id !== id) };
+      });
+      queryClient.removeQueries({ queryKey: ['session', id] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      router.back();
     },
   });
 

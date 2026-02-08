@@ -51,10 +51,14 @@ export const boardConnectionRoutes: FastifyPluginAsync = async (app) => {
 
   // Trigger sync
   app.post<{ Params: { id: string } }>('/:id/sync', async (request) => {
-    const result = await boardImportService.importKilterHistory(
-      request.userId,
-      request.params.id,
-    );
-    return { data: result };
+    try {
+      const result = await boardImportService.importKilterHistory(
+        request.userId,
+        request.params.id,
+      );
+      return { data: result };
+    } catch (err: any) {
+      throw badRequest(err.message ?? 'Sync failed');
+    }
   });
 };

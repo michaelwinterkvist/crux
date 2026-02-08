@@ -124,32 +124,29 @@ async function* syncPages(
   }
 }
 
-export async function fetchAscents(token: string, since?: Date): Promise<KilterAscent[]> {
-  const sinceStr = since
-    ? since.toISOString().replace('T', ' ').replace('Z', '')
-    : BASE_SYNC_DATE;
-
-  const ascents: KilterAscent[] = [];
-  for await (const page of syncPages({ ascents: sinceStr }, token)) {
-    if (Array.isArray(page.ascents)) {
-      ascents.push(...(page.ascents as KilterAscent[]));
-    }
-  }
-  return ascents;
+export interface KilterSyncResult {
+  ascents: KilterAscent[];
+  climbs: KilterClimb[];
 }
 
-export async function fetchClimbs(token: string, since?: Date): Promise<KilterClimb[]> {
+export async function fetchAscentsAndClimbs(token: string, since?: Date): Promise<KilterSyncResult> {
   const sinceStr = since
     ? since.toISOString().replace('T', ' ').replace('Z', '')
     : BASE_SYNC_DATE;
 
-  const climbs: KilterClimb[] = [];
-  for await (const page of syncPages({ climbs: sinceStr }, token)) {
+  const result: KilterSyncResult = { ascents: [], climbs: [] };
+
+  // Request ascents and climbs together in one sync call
+  for await (const page of syncPages({ ascents: sinceStr, climbs: sinceStr }, token)) {
+    if (Array.isArray(page.ascents)) {
+      result.ascents.push(...(page.ascents as KilterAscent[]));
+    }
     if (Array.isArray(page.climbs)) {
-      climbs.push(...(page.climbs as KilterClimb[]));
+      result.climbs.push(...(page.climbs as KilterClimb[]));
     }
   }
-  return climbs;
+
+  return result;
 }
 
 export function buildClimbUrl(climbUuid: string): string {
