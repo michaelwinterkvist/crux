@@ -11,6 +11,7 @@ import { projectRoutes } from './routes/projects.js';
 import { wellbeingRoutes } from './routes/wellbeing.js';
 import { statsRoutes } from './routes/stats.js';
 import { gradeRoutes } from './routes/grades.js';
+import { boardConnectionRoutes } from './routes/board-connections.js';
 
 export async function buildApp() {
   const app = Fastify({
@@ -58,6 +59,7 @@ export async function buildApp() {
   await app.register(wellbeingRoutes, { prefix: '/api/v1/wellbeing' });
   await app.register(statsRoutes, { prefix: '/api/v1/stats' });
   await app.register(gradeRoutes, { prefix: '/api/v1/grades' });
+  await app.register(boardConnectionRoutes, { prefix: '/api/v1/board-connections' });
 
   return app;
 }

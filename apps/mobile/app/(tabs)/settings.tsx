@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../../hooks/useAuth';
 import { colors, spacing, fontSize, borderRadius } from '../../theme';
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -30,6 +33,14 @@ export default function SettingsScreen() {
           <Text style={styles.label}>Units</Text>
           <Text style={styles.value}>Metric</Text>
         </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Integrations</Text>
+        <Pressable style={styles.card} onPress={() => router.push('/settings/board-connections')}>
+          <Text style={styles.label}>Board Connections</Text>
+          <Feather name="chevron-right" size={18} color={colors.textSecondary} />
+        </Pressable>
       </View>
 
       <View style={styles.section}>

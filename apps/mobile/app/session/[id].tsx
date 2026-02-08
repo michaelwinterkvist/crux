@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
 import { api } from '../../lib/api';
 import { GradeChip } from '../../components/GradeChip';
 import { formatDate } from '@crux/shared';
@@ -41,6 +42,26 @@ export default function SessionDetailScreen() {
     },
   });
 
+  const deleteSession = useMutation({
+    mutationFn: () => api.delete(`/sessions/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      router.replace('/(tabs)/sessions');
+    },
+  });
+
+  function handleDeleteSession() {
+    Alert.alert('Delete Session', 'Remove this session and all its ascents?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => deleteSession.mutate(),
+      },
+    ]);
+  }
+
   const session = data?.data;
 
   if (isLoading || !session) {
@@ -55,7 +76,17 @@ export default function SessionDetailScreen() {
     <View style={styles.container}>
       {/* Session Header */}
       <View style={styles.header}>
-        <Text style={styles.date}>{formatDate(session.date)}</Text>
+        <View style={styles.headerTop}>
+          <Text style={styles.date}>{formatDate(session.date)}</Text>
+          <View style={styles.headerActions}>
+            <Pressable style={styles.headerButton} onPress={() => router.push(`/session/edit?id=${id}`)}>
+              <Feather name="edit-2" size={18} color={colors.textSecondary} />
+            </Pressable>
+            <Pressable style={styles.headerButton} onPress={handleDeleteSession}>
+              <Feather name="trash-2" size={18} color={colors.error} />
+            </Pressable>
+          </View>
+        </View>
         <Text style={styles.meta}>
           {session.type}{session.locationName ? ` · ${session.locationName}` : ''}
           {session.isOutdoor ? ' · outdoor' : ''}
@@ -141,6 +172,18 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  headerButton: {
+    padding: spacing.xs,
   },
   date: {
     color: colors.text,

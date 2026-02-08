@@ -8,3 +8,5 @@ export * from './training.js';
 export * from './calendar.js';
 export * from './media.js';
 export * from './grades.js';
+export * from './board-connections.js';
+export * from './imported-climbs.js';
