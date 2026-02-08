@@ -44,9 +44,9 @@ export default function SessionDetailScreen() {
 
   const deleteSession = useMutation({
     mutationFn: () => api.delete(`/sessions/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sessions'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['sessions'] });
+      await queryClient.invalidateQueries({ queryKey: ['stats'] });
       router.replace('/(tabs)/sessions');
     },
   });

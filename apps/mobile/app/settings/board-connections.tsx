@@ -29,6 +29,7 @@ export default function BoardConnectionsScreen() {
   const [boardType, setBoardType] = useState<string>('kilter');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [syncResult, setSyncResult] = useState<ImportResult | null>(null);
 
   const { data, isLoading } = useQuery({
@@ -193,14 +194,19 @@ export default function BoardConnectionsScreen() {
           />
 
           <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Board account password"
-            placeholderTextColor={colors.textMuted}
-            secureTextEntry
-          />
+          <View style={styles.passwordRow}>
+            <TextInput
+              style={styles.passwordInput}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Board account password"
+              placeholderTextColor={colors.textMuted}
+              secureTextEntry={!showPassword}
+            />
+            <Pressable style={styles.eyeButton} onPress={() => setShowPassword(!showPassword)}>
+              <Feather name={showPassword ? 'eye-off' : 'eye'} size={18} color={colors.textSecondary} />
+            </Pressable>
+          </View>
 
           <View style={styles.formActions}>
             <Pressable style={styles.cancelButton} onPress={() => setShowForm(false)}>
@@ -350,6 +356,23 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  passwordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  passwordInput: {
+    flex: 1,
+    padding: spacing.md,
+    color: colors.text,
+    fontSize: fontSize.md,
+  },
+  eyeButton: {
+    padding: spacing.md,
   },
   segmented: {
     flexDirection: 'row',

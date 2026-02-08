@@ -53,4 +53,4 @@ export function kilterDifficultyToNumeric(difficulty: number): number {
   return def?.numeric ?? 300;
 }
 
-export const KILTER_API_BASE_URL = 'https://api.kilterboardapp.com';
+export const KILTER_API_BASE_URL = 'https://kilterboardapp.com';

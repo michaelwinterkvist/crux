@@ -62,9 +62,10 @@ export async function authenticate(username: string, password: string): Promise<
   }
 
   const data = await response.json();
+  // data.session is the token string directly (not an object)
   return {
-    token: data.session.token,
-    userId: data.session.user_id,
+    token: data.session,
+    userId: data.user_id ?? 0,
   };
 }
 

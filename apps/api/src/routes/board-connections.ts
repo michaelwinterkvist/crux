@@ -24,7 +24,12 @@ export const boardConnectionRoutes: FastifyPluginAsync = async (app) => {
     }
 
     // Validate credentials with Kilter
-    const kilterSession = await kilterService.authenticate(username, password);
+    let kilterSession: kilterService.KilterSession;
+    try {
+      kilterSession = await kilterService.authenticate(username, password);
+    } catch (err: any) {
+      throw badRequest(err.message ?? 'Could not authenticate with Kilter Board');
+    }
 
     // Create connection
     const connection = await boardConnectionService.create(
@@ -32,7 +37,7 @@ export const boardConnectionRoutes: FastifyPluginAsync = async (app) => {
       boardType,
       username,
       password,
-      String(kilterSession.userId),
+      kilterSession.userId ? String(kilterSession.userId) : undefined,
     );
 
     reply.code(201).send({ data: connection });
