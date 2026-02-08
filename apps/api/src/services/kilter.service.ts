@@ -95,7 +95,6 @@ async function* syncPages(
       headers,
       body,
     });
-    response.raise_for_status;
     if (!response.ok) {
       throw new Error(`Kilter sync failed: ${response.status}`);
     }
