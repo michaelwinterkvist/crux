@@ -12,14 +12,14 @@ export async function importKilterHistory(
   userId: string,
   connectionId: string,
 ): Promise<ImportResult> {
-  // Get connection and decrypt credentials
+  // Step 1: Get connection
   const connection = await boardConnectionService.getById(userId, connectionId);
   const password = boardConnectionService.getDecryptedPassword(connection);
 
-  // Authenticate with Kilter
+  // Step 2: Authenticate with Kilter
   const kilterSession = await kilterService.authenticate(connection.username, password);
 
-  // Fetch ascents and climbs together (incremental if we've synced before)
+  // Step 3: Fetch ascents and climbs
   const since = connection.lastSyncAt ?? undefined;
   const syncData = await kilterService.fetchAscentsAndClimbs(kilterSession.token, since ?? undefined);
   const kilterAscents = syncData.ascents;
@@ -30,32 +30,36 @@ export async function importKilterHistory(
     climbMap.set(climb.uuid, climb);
   }
 
-  // Filter already-imported
+  // Step 4: Filter already-imported
   const newAscents: kilterService.KilterAscent[] = [];
   let duplicatesSkipped = 0;
 
   for (const ascent of kilterAscents) {
-    const alreadyImported = await isImported(
-      userId,
-      'kilter',
-      ascent.climb_uuid,
-      ascent.angle,
-      new Date(ascent.climbed_at),
-    );
-    if (alreadyImported) {
-      duplicatesSkipped++;
-    } else {
+    try {
+      const alreadyImported = await isImported(
+        userId,
+        'kilter',
+        ascent.climb_uuid,
+        ascent.angle,
+        new Date(ascent.climbed_at),
+      );
+      if (alreadyImported) {
+        duplicatesSkipped++;
+      } else {
+        newAscents.push(ascent);
+      }
+    } catch {
+      // Skip ascents with invalid data
       newAscents.push(ascent);
     }
   }
 
-  // Group by date
+  // Step 5: Group by date and create sessions
   const byDate = groupByDate(newAscents);
 
   let sessionsCreated = 0;
   let ascentsImported = 0;
 
-  // Create sessions + ascents for each date
   for (const [dateStr, dateAscents] of byDate) {
     const sessionId = await createSessionWithAscents(userId, dateStr, dateAscents, climbMap);
     if (sessionId) {
@@ -64,13 +68,8 @@ export async function importKilterHistory(
     }
   }
 
-  // Update lastSyncAt
+  // Step 6: Update lastSyncAt
   await boardConnectionService.updateLastSync(connectionId);
-
-  // Update boardUserId if not set
-  if (!connection.boardUserId && kilterSession.userId) {
-    // Store the Kilter user ID for future reference
-  }
 
   return { sessionsCreated, ascentsImported, duplicatesSkipped };
 }

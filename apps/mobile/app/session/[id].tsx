@@ -54,6 +54,9 @@ export default function SessionDetailScreen() {
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       router.back();
     },
+    onError: (err: any) => {
+      Alert.alert('Delete Failed', err.message ?? 'Could not delete session');
+    },
   });
 
   function handleDeleteSession() {

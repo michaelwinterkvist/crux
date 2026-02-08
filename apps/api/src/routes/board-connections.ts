@@ -50,7 +50,7 @@ export const boardConnectionRoutes: FastifyPluginAsync = async (app) => {
   });
 
   // Trigger sync
-  app.post<{ Params: { id: string } }>('/:id/sync', async (request) => {
+  app.post<{ Params: { id: string } }>('/:id/sync', async (request, reply) => {
     try {
       const result = await boardImportService.importKilterHistory(
         request.userId,
@@ -58,7 +58,11 @@ export const boardConnectionRoutes: FastifyPluginAsync = async (app) => {
       );
       return { data: result };
     } catch (err: any) {
-      throw badRequest(err.message ?? 'Sync failed');
+      const message = err?.message ?? String(err) ?? 'Sync failed';
+      app.log.error({ err }, `Kilter sync error: ${message}`);
+      reply.code(400).send({
+        error: { code: 'SYNC_ERROR', message },
+      });
     }
   });
 };
