@@ -62,9 +62,12 @@ export async function authenticate(username: string, password: string): Promise<
   }
 
   const data = await response.json();
-  // data.session is the token string directly (not an object)
+  const token = data.session;
+  if (!token || typeof token !== 'string') {
+    throw new Error(`Kilter auth: unexpected session format: ${JSON.stringify(data).slice(0, 300)}`);
+  }
   return {
-    token: data.session,
+    token,
     userId: data.user_id ?? 0,
   };
 }
@@ -97,7 +100,8 @@ async function* syncPages(
       body,
     });
     if (!response.ok) {
-      throw new Error(`Kilter sync failed: ${response.status}`);
+      const errorBody = await response.text().catch(() => '');
+      throw new Error(`Kilter sync failed: ${response.status} ${response.url} body=${errorBody.slice(0, 200)}`);
     }
 
     const json = await response.json();
