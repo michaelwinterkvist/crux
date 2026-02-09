@@ -43,7 +43,7 @@ export async function buildApp() {
 
     app.log.error(error);
     reply.code(500).send({
-      error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Internal server error' },
     });
   });
 
