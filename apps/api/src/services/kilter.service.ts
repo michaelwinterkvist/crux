@@ -62,14 +62,14 @@ export async function authenticate(username: string, password: string): Promise<
   }
 
   const data = await response.json();
-  const token = data.session;
-  if (!token || typeof token !== 'string') {
-    throw new Error(`Kilter auth: unexpected session format: ${JSON.stringify(data).slice(0, 300)}`);
+  // session can be a string token or an object { token, user_id }
+  const session = data.session;
+  const token = typeof session === 'string' ? session : session?.token;
+  const userId = typeof session === 'string' ? (data.user_id ?? 0) : (session?.user_id ?? 0);
+  if (!token) {
+    throw new Error(`Kilter auth: no token in response: ${JSON.stringify(data).slice(0, 300)}`);
   }
-  return {
-    token,
-    userId: data.user_id ?? 0,
-  };
+  return { token, userId };
 }
 
 async function* syncPages(
