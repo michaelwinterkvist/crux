@@ -24,4 +24,4 @@ WORKDIR /app/apps/api
 EXPOSE 3000
 
 # Push schema + seed grades on every startup, then run app
-CMD ["sh", "-c", "npx tsx ./node_modules/drizzle-kit/bin.cjs push --force 2>&1 && npx tsx src/db/seed.ts 2>&1 && node dist/index.js"]
+CMD ["sh", "-c", "npx tsx /app/node_modules/drizzle-kit/bin.cjs push --force 2>&1 && npx tsx src/db/seed.ts 2>&1 && node dist/index.js"]
