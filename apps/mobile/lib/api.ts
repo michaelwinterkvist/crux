@@ -79,9 +79,8 @@ async function request<T>(
     if (qs) url += `?${qs}`;
   }
 
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
+  const headers: Record<string, string> = {};
+  if (body) headers['Content-Type'] = 'application/json';
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   let res = await fetch(url, {
